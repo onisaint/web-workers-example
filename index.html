@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Web workers example</title>
+</head>
+
+<body>
+    <button id="calcFibSync">calculate fibbonaci in sync</button>
+    <button id="calcFibAsync">calculate fibbonaci in Async</button>
+    <h1>Output goes here</h1>
+    <div id="output"></div>
+
+    <script>
+        const CALC_FIB_SYNC = 'calculateFibbonaciSync',
+            CALC_FIB_ASYNC = 'calculateFibbonaciAsync';
+
+        (() => {
+            console.log(self);
+            const worker = new Worker('./worker.js');
+
+            const $calcFibSync = document.getElementById('calcFibSync');
+            const $calcFibAsync = document.getElementById('calcFibAsync');
+            const $output = document.getElementById('output');
+
+            $calcFibSync.addEventListener('click', (_) => {
+                debugger;
+                worker.postMessage(CALC_FIB_SYNC);
+                worker.addEventListener('message', ({ data }) => {
+                    if (data.type === CALC_FIB_SYNC) {
+                        $output.innerHTML = '';
+                        const result = data.result;
+                        console.group('dataSync');
+                        console.log(result);
+                        console.groupEnd();
+                        result.map((fib, i) => {
+                            const $p = document.createElement('p');
+                            $p.innerText = i + ' => ' + fib;
+                            $output.append($p);
+                        })
+                    }
+                })
+            });
+
+            $calcFibAsync.addEventListener('click', (_) => {
+                worker.postMessage(CALC_FIB_ASYNC);
+                worker.addEventListener('message', ({ data }) => {
+                    if(data.type === CALC_FIB_ASYNC) {
+                        if(data.result === 0) {
+                            $output.innerHTML = '';
+                        }
+
+                        const result = data.result;
+                        console.group('dataAsync');
+                        console.log(result);
+                        console.groupEnd();
+                        
+                        const $p = document.createElement('p');
+                        $p.innerText = result;
+                        $output.append($p);
+                    }
+                })
+            })
+
+        })();
+
+    </script>
+</body>
+
+</html>
