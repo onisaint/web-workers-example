@@ -3,8 +3,9 @@ const CALC_FIB_SYNC = 'calculateFibbonaciSync',
 
 let isCalled = false;
 
-self.addEventListener('message', ({ data }) => {
-    switch (data) {
+self.addEventListener('message', (e) => {
+    console.log(e);
+    switch (e.data) {
         case CALC_FIB_SYNC: {
             const result = calculateFibbonaciSequence(100 ** 2);
             self.postMessage({
