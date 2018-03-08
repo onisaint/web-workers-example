@@ -25,54 +25,46 @@
             const $calcFibAsync = document.getElementById('calcFibAsync');
             const $output = document.getElementById('output');
 
+            worker.addEventListener('message', ({ data }) => {
+                if (data.type === CALC_FIB_SYNC) {
+                    $output.innerHTML = '';
+                    const result = data.result;
+                    console.log(result);
+                    console.groupEnd();
+
+                    result.map((fib, i) => {
+                        const $p = document.createElement('p');
+                        $p.innerText = i + ' => ' + fib;
+                        $output.append($p);
+                    })
+                } else if (data.type === CALC_FIB_ASYNC) {
+                    if (data.result === 0) {
+                        $output.innerHTML = '';
+                    }
+
+                    const result = data.result;
+                    console.log(result);
+                    console.groupEnd('dataAsync');
+
+                    const $p = document.createElement('p');
+                    $p.innerText = result;
+                    $output.append($p);
+                }
+            })
+
+            
             $calcFibSync.addEventListener('click', (e) => {
                 console.group('dataSync');
-
-                let hitIndex = 0;
                 worker.postMessage(CALC_FIB_SYNC);
-                worker.addEventListener('message', ({ data }) => {
-                    if (data.type === CALC_FIB_SYNC) {
-                        console.info('hitCount:', hitIndex++);                        
-                        $output.innerHTML = '';
-                        const result = data.result;
-                        console.log(result);
-                        console.groupEnd();
-                        
-                        result.map((fib, i) => {
-                            const $p = document.createElement('p');
-                            $p.innerText = i + ' => ' + fib;
-                            $output.append($p);
-                        })
-                    }
-                })
-                
-                
             });
 
             $calcFibAsync.addEventListener('click', (e) => {
                 console.group('dataAsync');
-
-                let hitIndex = 0;                
                 worker.postMessage(CALC_FIB_ASYNC);
-                worker.addEventListener('message', ({ data }) => {
-                    if (data.type === CALC_FIB_ASYNC) {
-                        if (data.result === 0) {
-                            $output.innerHTML = '';
-                        }
-
-                        console.info('hitCount:', hitIndex++);
-                        const result = data.result;
-                        console.log(result);
-                        console.groupEnd('dataAsync');
-
-                        const $p = document.createElement('p');
-                        $p.innerText = result;
-                        $output.append($p);
-                    }
-                })
             })
         })();
 
     </script>
 </body>
+
 </html>
