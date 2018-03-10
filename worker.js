@@ -14,9 +14,8 @@ self.addEventListener('message', (e) => {
             break;
         }
         case CALC_FIB_ASYNC: {
-            const result = calculateFibbonaciGenerator().next().value;
             self.postMessage({
-                result,
+                result: FibAsyncPipe.next().value,
                 type: CALC_FIB_ASYNC
             });
             break;
@@ -34,6 +33,8 @@ function* calculateFibbonaciGenerator() {
         [a, b] = [b, a + b];
     }
 }
+
+const FibAsyncPipe = calculateFibbonaciGenerator();
 
 function calculateFibbonaciSequence(n) {
     const fibSeries = [];
